@@ -6,7 +6,7 @@
       </span>
     </template>
     <template #item="{ item, props, hasSubmenu, root }">
-      <router-link v-if="item.route" :to="item.route" class="flex items-center ml-6 p-4">
+      <router-link v-if="item.route" :to="item.route" class="flex items-center p-4">
         <span :class="item.icon"/>
         <span class="ml-1">{{item.label}}</span>
       </router-link>
@@ -15,7 +15,7 @@
       <div class="flex items-center gap-2">
         <div v-if="isAuthenticated && user">
           <span class="pi pi-fw pi-user mr-4"/>{{user.name}}
-          <Button @click="logout" class="ml-4 bg-[#FDE94C] hover:bg-[#f0d535]">Logout</Button>
+          <Button @click="logout" class="ml-4">Logout</Button>
         </div>
         <div v-else>
           <form @submit.prevent="login">
