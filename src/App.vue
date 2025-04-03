@@ -5,8 +5,8 @@
         <img src="@/assets/logo.svg" alt="logo" width="50" />
       </span>
     </template>
-    <template #item="{ item, props, hasSubmenu, root }">
-      <router-link v-if="item.route" :to="item.route" class="flex items-center ml-6 p-4">
+    <template #item="{ item}">
+      <router-link v-if="item.route" :to="item.route" class="flex items-center p-4">
         <span :class="item.icon"/>
         <span class="ml-1">{{item.label}}</span>
       </router-link>
