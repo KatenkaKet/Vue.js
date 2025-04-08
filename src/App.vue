@@ -32,6 +32,7 @@
       </div>
     </template>
   </Menubar>
+  <Toast position="bottom-right" />
   <router-view></router-view>
 </template>
 

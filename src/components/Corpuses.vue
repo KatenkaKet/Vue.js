@@ -13,23 +13,41 @@
       :first="offset"
     >
       <Column field="id" header="ID" />
-      <Column field="corpus_name" header="Name" />  <!--  Изменено на corpus_name -->
+      <Column field="corpus_name" header="Name" />
+      <Column header="Изображение">
+        <template #body="slotProps">
+          <img
+            v-if="slotProps.data.image_url"
+            :src="slotProps.data.image_url"
+            alt="Corpus Image"
+            style="max-width: 100px; max-height: 100px"
+          />
+          <span v-else>Нет изображения</span>
+        </template>
+      </Column>
     </DataTable>
+    <div class="text-end">
+      <Button
+        type="button"
+        @click="this.$router.push('/createCorpus')"
+        icon="pi pi-plus"
+        label="Добавить корпус"
+      />
+    </div>
   </div>
   <div v-else-if="dataStore.loading">Loading...</div>
   <div v-else-if="dataStore.errorMessage">Error: {{ dataStore.errorMessage }}</div>
 </template>
 
-
-
 <script>
-import DataTable from "primevue/datatable";
-import Column from "primevue/column";
-import { useDataStore } from "@/stores/dataStore.js";
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import { useDataStore } from '@/stores/dataStore.js';
+import Button from 'primevue/button';
 
 export default {
-  name: "Corpuses_comp",
-  components: { DataTable, Column },
+  name: 'Corpuses_comp',
+  components: { DataTable, Column, Button },
   data() {
     return {
       dataStore: useDataStore(),
@@ -46,14 +64,14 @@ export default {
     },
   },
   mounted() {
-    console.log("Corpuses component mounted.");
+    console.log('Corpuses component mounted.');
     this.loadData(); // Load data on mount
   },
   methods: {
     async loadData() {
       await this.dataStore.get_corpuses(); // Load initial data
       await this.dataStore.get_corpuses_total();
-      console.log("Corpuses loaded:", this.corpuses);
+      console.log('Corpuses loaded:', this.corpuses);
     },
     onPageChange(event) {
       this.offset = event.first;
@@ -64,5 +82,3 @@ export default {
   },
 };
 </script>
-
-<style scoped></style>

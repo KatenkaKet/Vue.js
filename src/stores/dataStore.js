@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import axios from 'axios';
-import { useAuthStore } from "@/stores/authStore"; // Import authStore
+import { useAuthStore } from "@/stores/authStore";
+import * as response from "autoprefixer"; // Import authStore
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -15,6 +16,8 @@ export const useDataStore = defineStore('data', {
     errorMessageRooms: "",
     loadingCorpuses: false,
     loadingRooms: false,
+    errorCode: "",
+    errorMessage: "",
   }),
   getters: {
     authToken() {
@@ -37,10 +40,21 @@ export const useDataStore = defineStore('data', {
             Authorization: `Bearer ${this.authToken}`, // Use getter to get token
           },
         });
-        this.corpuses = response.data;
+        // Проверяем, что response.data - массив
+        if (Array.isArray(response.data)) {
+          this.corpuses = response.data.map(corpus => ({
+            ...corpus,
+            image_url: corpus.image_url || null // Ensure image_url exists, default to null
+          }));
+        } else {
+          console.warn('API вернул неверный формат данных. Ожидался массив.');
+          this.errorMessageCorpuses = 'Ошибка: Неверный формат данных от сервера';
+          this.corpuses = []; // Предотвращаем ошибки при рендеринге
+        }
       } catch (error) {
         this.errorMessageCorpuses = this.handleApiError(error);
         console.error(error);
+        this.corpuses = []; // Предотвращаем ошибки при рендеринге
       } finally {
         this.loadingCorpuses = false;
       }
@@ -107,5 +121,31 @@ export const useDataStore = defineStore('data', {
         return 'An unexpected error occurred.';
       }
     },
+    async createCorpus(formData) {
+      this.errorMessage = "";
+      try{
+        const response = await axios.post(backendUrl + '/corpus', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: 'Bearer ' + localStorage.getItem('token'),
+          },
+        }
+      );
+      this.errorCode = response.data.code;
+      this.errorMessage = response.data.message;
+      } catch (error) {
+        if (error.response) {
+          this.errorCode = 11;
+          this.errorMessage = error.response.data.message;
+        }else if (error.request) {
+          this.errorCode = 12;
+          this.errorMessage = error.message;
+          console.log(error.message);
+        } else {
+          this.errorCode = 13;
+          console.log(error.message);
+        }
+      }
+    }
   },
 });
